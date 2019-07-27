@@ -1,3 +1,4 @@
+
 // find 'substr' from a fixed-length buffer 
 // ('full_data' will be treated as binary data buffer)
 // return NULL if not found
