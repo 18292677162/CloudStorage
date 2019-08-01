@@ -5,6 +5,9 @@
 #include <QJsonValue>
 #include <QFile>
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -54,6 +57,25 @@ MainWindow::MainWindow(QWidget *parent) :
             qDebug() << ip << port;
         }
     }
+
+    // 创建 manager 对象，做 post, get
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    // 初始化一个 QNetworkRequest 类
+    QNetworkRequest res;
+
+    // 设置 http headers 伪装浏览器
+    res.setHeader(QNetworkRequest::UserAgentHeader,
+                  "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36");
+    res.setUrl(QUrl("http://www.baidu.com:80"));
+    QNetworkReply *reply = manager->post(res, "");
+
+    // 读服务器回复数据
+    connect(reply, &QNetworkReply::readyRead, this, [=]()
+    {
+       // 读取数据
+        QByteArray data2 = reply->readAll();
+        qDebug() << data2;
+    });
 }
 
 MainWindow::~MainWindow()
