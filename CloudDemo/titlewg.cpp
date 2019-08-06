@@ -15,6 +15,26 @@ TitleWg::TitleWg(QWidget *parent) :
     ui->wgtitle->setStyleSheet("color:rgb(255, 255, 255)");
 
     m_parent = parent;
+
+    // 按钮功能实现
+    // 设置
+    connect(ui->set, &QToolButton::clicked, this, [=]()
+    {
+        // 发送自定义信号
+        emit showSetWg();
+    });
+
+    // 最小化
+    connect(ui->min, &QToolButton::clicked, this, [=]()
+    {
+        m_parent->showMinimized();
+    });
+
+    // 关闭
+    connect(ui->close, &QToolButton::clicked, this, [=]()
+    {
+        emit closeWindow();
+    });
 }
 
 TitleWg::~TitleWg()

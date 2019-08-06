@@ -2,9 +2,11 @@
     <qresource prefix="/">
         <file>image/balckButton.png</file>
         <file>image/display_bk.bmp</file>
+        <file>image/login_bk.jpg</file>
         <file>image/login_close.png</file>
         <file>image/login_min.png</file>
         <file>image/login_setting.png</file>
+        <file>image/logo.ico</file>
         <file>image/tile_close.png</file>
         <file>image/tile_file.png</file>
         <file>image/tile_hot.png</file>
@@ -20,7 +22,5 @@
         <file>image/title_share.png</file>
         <file>image/title_user.png</file>
         <file>image/upload.png</file>
-        <file>image/logo.ico</file>
-        <file>image/login_bk.jpg</file>
     </qresource>
 </RCC>

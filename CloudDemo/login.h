@@ -19,6 +19,11 @@ protected:
     // 绘图事件函数
     void paintEvent(QPaintEvent *event);
 
+private slots:
+    void on_signup_button_2_clicked();
+
+    void on_toolButton_4_clicked();
+
 private:
     Ui::Login *ui;
 };

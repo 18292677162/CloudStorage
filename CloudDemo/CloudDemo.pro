@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,12 +25,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        common/common.cpp \
+        common/des.c \
         login.cpp \
         main.cpp \
         mainwindow.cpp \
         titlewg.cpp
 
 HEADERS += \
+        common/common.h \
+        common/des.h \
         login.h \
         mainwindow.h \
         titlewg.h
