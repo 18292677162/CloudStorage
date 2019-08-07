@@ -1,7 +1,15 @@
-#include "login.h"
+﻿#include "login.h"
 #include "ui_login.h"
 #include <QPainter>
 #include <QMessageBox>
+#include  <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QFile>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include "common/common.h"
 
 Login::Login(QWidget *parent) :
@@ -76,7 +84,54 @@ void Login::paintEvent(QPaintEvent *event)
 // 用户注册
 void Login::on_signup_button_2_clicked()
 {
+    // 取数据
+    QString ip = ui->ip_set->text();
+    QString port = ui->port_set->text();
 
+    QString name = ui->name_reg->text();
+    QString nick = ui->id_reg->text();
+    QString pwd = ui->passwd__reg->text();
+    QString phone = ui->phone_reg->text();
+    QString mail = ui->email_reg->text();
+    // 注册信息 to json
+    QByteArray postData = getRegJson(name, nick, pwd, phone, mail);
+
+    // 发送 http 请求协议
+    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
+    // http 头
+    QNetworkRequest request;
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setHeader(QNetworkRequest::ContentLengthHeader, postData.size());
+    // url
+    QString url = QString("http://%1:%2/reg").arg(ip).arg(port);
+    request.setUrl(QUrl(url));
+    QNetworkReply* reply = manager->post(request, postData);
+    // 接收 server 回复
+    connect(reply, &QNetworkReply::readyRead, [=]()
+    {
+        // 读取数据
+        QByteArray jsonRes = reply->readAll();
+        QJsonDocument docRes = QJsonDocument::fromJson(jsonRes);
+        // 取回复
+        QJsonObject objRes =  docRes.object();
+        // 取回复子对象数据
+        QString status = objRes.value("code").toString();
+        if(status == "002")
+        {
+            // success
+            qDebug() << "2";
+        }
+        else if(status == "003")
+        {
+            // 已存在
+            qDebug() << "3";
+        }
+        else if(status == "004")
+        {
+            // fail
+            qDebug() << "4";
+        }
+    });
 }
 
 // 服务器设置
@@ -105,4 +160,103 @@ void Login::on_toolButton_4_clicked()
         ui->port_set->setFocus();
         return;
     }
+}
+
+// 保存配置文件信息
+void Login::saveWebInfo(QString ip, QString port, QString type_path)
+{
+    // 读文件
+    QFile file(type_path);
+    // 文件是否存在
+    bool bl = file.open(QIODevice::ReadOnly);
+    if(bl == false)
+    {
+        // 创建 json 对象
+        QJsonObject newobj;
+
+        QJsonObject newlogin;
+        newlogin.insert("pwd", "");
+        newlogin.insert("remember", "");
+        newlogin.insert("user", "");
+
+        QJsonObject newtype_path;
+        newtype_path.insert("path", "");
+
+        QJsonObject newweb_server;
+        newweb_server.insert("ip", "");
+        newweb_server.insert("port", "");
+
+        newobj.insert("login", QJsonValue(newlogin));
+        newobj.insert("type_path", QJsonValue(newtype_path));
+        newobj.insert("web_server", QJsonValue(newweb_server));
+
+        // 写入文件
+        QJsonDocument newdoc(newobj);
+        // 将 json 对象转换为字符串
+        QByteArray newFile = newdoc.toJson();
+        // 写新文件
+        file.open(QIODevice::WriteOnly);
+        file.write(newFile);
+        file.close();
+        return;
+    }
+    // 存在
+    QByteArray data = file.readAll();
+    // 读配置文件信息
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    file.close();
+    if(!doc.isObject())
+    {
+        return;
+    }
+    // 取 login
+    QJsonObject obj =  doc.object();
+    QJsonObject loginobj = obj.value("login").toObject();
+    // 取 login 子对象数据
+    QString pwd = loginobj.value("pwd").toString();
+    QString remember = loginobj.value("remember").toString();
+    QString user = loginobj.value("user").toString();
+    // 存储
+    QMap<QString, QVariant> logininfo;
+    logininfo.insert("pwd", pwd);
+    logininfo.insert("remember", remember);
+    logininfo.insert("user", user);
+
+    // 取 path 子对象数据
+    QJsonObject pathobj = obj.value("login").toObject();
+    QString path = pathobj.value("path").toString();
+    // 存储
+    QMap<QString, QVariant> pathinfo;
+    pathinfo.insert("path", path);
+
+    // 存储 web 信息
+    QMap<QString, QVariant> webinfo;
+    webinfo.insert("ip", QVariant(ip));
+    webinfo.insert("port", QVariant(port));
+
+    QMap<QString, QVariant> info;
+    info.insert("login", logininfo);
+    info.insert("type_path", pathinfo);
+    info.insert("web_server", webinfo);
+
+    doc = QJsonDocument::fromVariant(info);
+    // json -> 字符串 保存
+    data = doc.toJson();
+    // 写入文件
+    file.open(QIODevice::WriteOnly);
+    file.write(data);
+    file.close();
+}
+
+QByteArray Login::getRegJson(QString user, QString nick, QString pwd, QString phone, QString mail)
+{
+    QJsonObject regObj;
+    regObj.insert("user", user);
+    regObj.insert("nick", nick);
+    regObj.insert("pwd", pwd);
+    regObj.insert("phone", phone);
+    regObj.insert("mail", mail);
+
+    QJsonDocument regInfo(regObj);
+    return regInfo.toJson();
 }
