@@ -10,7 +10,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include "common/common.h"
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
@@ -75,6 +74,7 @@ Login::~Login()
 
 void Login::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     // 绘制背景
     QPainter p(this);
     QPixmap pixmap(":/image/login_bk.jpg");
@@ -92,12 +92,13 @@ void Login::on_signup_button_2_clicked()
     QString nick = ui->id_reg->text();
     QString pwd = ui->passwd__reg->text();
     QString phone = ui->phone_reg->text();
-    QString mail = ui->email_reg->text();
+    QString email = ui->email_reg->text();
+    // 正则表达式校验
     // 注册信息 to json
-    QByteArray postData = getRegJson(name, nick, pwd, phone, mail);
+    QByteArray postData = getRegJson(name, nick, pwd, phone, email);
 
-    // 发送 http 请求协议
-    QNetworkAccessManager * manager = new QNetworkAccessManager(this);
+    // http 请求协议类  Common全局对象
+    QNetworkAccessManager * manager = Common::getNetManager();
     // http 头
     QNetworkRequest request;
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -111,25 +112,43 @@ void Login::on_signup_button_2_clicked()
     {
         // 读取数据
         QByteArray jsonRes = reply->readAll();
+        /*
         QJsonDocument docRes = QJsonDocument::fromJson(jsonRes);
         // 取回复
         QJsonObject objRes =  docRes.object();
         // 取回复子对象数据
         QString status = objRes.value("code").toString();
+        */
+        QString status = m_cm.getCode(jsonRes);
+
         if(status == "002")
         {
             // success
-            qDebug() << "2";
+            // 当前注册信息填入登录框
+            ui->name_login->setText(name);
+            ui->passwd_login->setText(pwd);
+            // 清除注册信息
+            ui->name_reg->clear();
+            ui->id_reg ->clear();
+            ui->passwd__reg->clear();
+            ui->re_passwd_reg->clear();
+            ui->phone_reg->clear();
+            ui->email_reg->clear();
+            // 跳转到登录界面
+            ui->stackedWidget->setCurrentWidget(ui->login_page);
+            qDebug() << "success";
         }
         else if(status == "003")
         {
             // 已存在
-            qDebug() << "3";
+            QMessageBox::warning(this, "警告", "当前注册用户已存在!");
+            qDebug() << "已存在";
         }
         else if(status == "004")
         {
             // fail
-            qDebug() << "4";
+            QMessageBox::warning(this, "警告", "注册失败!");
+            qDebug() << "fail";
         }
     });
 }
@@ -154,15 +173,20 @@ void Login::on_toolButton_4_clicked()
     QRegExp exp1(PORT_REG);
     if(!exp1.exactMatch(port))
     {
-        QMessageBox::warning(this, "警告", "端口格式输入不正确");
+        QMessageBox::critical(this, "警告", "端口格式输入不正确");
         ui->port_set->clear();
         // 焦点
         ui->port_set->setFocus();
-        return;
     }
+    // 跳转到登陆界面
+    ui->stackedWidget->setCurrentWidget(ui->login_page);
+    // 将配置信息写入配置文件中
+    m_cm.writeWebInfo(ip, port);
+    return;
 }
 
 // 保存配置文件信息
+/*
 void Login::saveWebInfo(QString ip, QString port, QString type_path)
 {
     // 读文件
@@ -204,7 +228,6 @@ void Login::saveWebInfo(QString ip, QString port, QString type_path)
     QByteArray data = file.readAll();
     // 读配置文件信息
     QJsonDocument doc = QJsonDocument::fromJson(data);
-    file.close();
     if(!doc.isObject())
     {
         return;
@@ -247,16 +270,26 @@ void Login::saveWebInfo(QString ip, QString port, QString type_path)
     file.write(data);
     file.close();
 }
+*/
 
-QByteArray Login::getRegJson(QString user, QString nick, QString pwd, QString phone, QString mail)
+
+// 编辑注册 json data
+QByteArray Login::getRegJson(QString user, QString nick, QString pwd, QString phone, QString email)
 {
     QJsonObject regObj;
-    regObj.insert("user", user);
-    regObj.insert("nick", nick);
-    regObj.insert("pwd", pwd);
+    regObj.insert("userName", user);
+    regObj.insert("nickName", nick);
+    regObj.insert("firstPwd", pwd);
     regObj.insert("phone", phone);
-    regObj.insert("mail", mail);
+    regObj.insert("email", email);
 
+    // obj -> jsondoc
     QJsonDocument regInfo(regObj);
     return regInfo.toJson();
+}
+
+// 用户登录
+void Login::on_signin_button_clicked()
+{
+
 }
