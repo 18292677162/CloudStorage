@@ -291,5 +291,15 @@ QByteArray Login::getRegJson(QString user, QString nick, QString pwd, QString ph
 // 用户登录
 void Login::on_signin_button_clicked()
 {
-
+    // 取数据
+    QString user = ui->name_login->text();
+    QString passwd = ui->passwd_login->text();
+    QString ip = ui->ip_set->text();
+    QString port = ui->port_set->text();
+    // 数据校验
+    // 是否保存密码
+    bool remember = ui->remember_check->isChecked();
+    // 将文件保存到配置文件
+    m_cm.writeLoginInfo(user, passwd, remember);
+    // 登录的 json 数据包
 }
