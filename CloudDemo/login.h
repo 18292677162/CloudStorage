@@ -1,6 +1,7 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 #include "common/common.h"
+#include <mainwindow.h>
 
 #include <QDialog>
 
@@ -31,7 +32,13 @@ private slots:
     // void saveWebInfo(QString ip, QString port, QString path);
 
     // 注册信息 to Json
-    QByteArray getRegJson(QString user, QString nick, QString pwd, QString phone, QString mail);
+    QByteArray setRegJson(QString user, QString nick, QString pwd, QString phone, QString mail);
+
+    // 登录信息 to Json
+    QByteArray setLoginJson(QString user, QString passwd);
+
+    // 获取服务器登录信息
+    QStringList getLoginStatus(QByteArray json);
 
     // 初始化登录界面
 
@@ -39,7 +46,8 @@ private slots:
 
 private:
     Ui::Login *ui;
-
+    // 主窗口类 指针
+    MainWindow *m_mainWin;
     Common m_cm;
 };
 

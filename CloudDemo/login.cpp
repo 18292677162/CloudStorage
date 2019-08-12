@@ -23,6 +23,11 @@ Login::Login(QWidget *parent) :
     // 设置除ui设置外所有字体
     this->setFont(QFont("宋体", 11, QFont::Normal, false));
 
+    // 密码打码
+    ui->passwd_reg->setEchoMode(QLineEdit::Password);
+    ui->passwd_login->setEchoMode(QLineEdit::Password);
+    ui->re_passwd_reg->setEchoMode(QLineEdit::Password);
+
     // titlewidget信号处理
     connect(ui->title_wg, &TitleWg::showSetWg, this, [=]()
     {
@@ -47,7 +52,7 @@ Login::Login(QWidget *parent) :
             // 清空数据
             ui->name_reg->clear();
             ui->id_reg ->clear();
-            ui->passwd__reg->clear();
+            ui->passwd_reg->clear();
             ui->re_passwd_reg->clear();
             ui->phone_reg->clear();
             ui->email_reg->clear();
@@ -90,14 +95,61 @@ void Login::on_signup_button_2_clicked()
 
     QString name = ui->name_reg->text();
     QString nick = ui->id_reg->text();
-    QString pwd = ui->passwd__reg->text();
+    QString firstPwd = ui->passwd_reg->text();
+    QString secondPwd = ui->passwd_reg->text();
     QString phone = ui->phone_reg->text();
     QString email = ui->email_reg->text();
     // 正则表达式校验
+    QRegExp regexp(USER_REG);
+    if(!regexp.exactMatch(name))
+    {
+        QMessageBox::warning(this, "警告", "用户名格式不正确");
+        ui->name_reg->clear();
+        ui->name_reg->setFocus();
+        return;
+    }
+    if(!regexp.exactMatch(nick))
+    {
+        QMessageBox::warning(this, "警告", "昵称格式不正确");
+        ui->id_reg->clear();
+        ui->id_reg->setFocus();
+        return;
+    }
+    regexp.setPattern(PASSWD_REG);
+    if(!regexp.exactMatch(firstPwd))
+    {
+        QMessageBox::warning(this, "警告", "密码格式不正确");
+        ui->passwd_reg->clear();
+        ui->passwd_reg->setFocus();
+        return;
+    }
+    if(firstPwd != secondPwd)
+    {
+        QMessageBox::warning(this, "警告", "两次密码输入不一致，请重新输入");
+        ui->re_passwd_reg->clear();
+        ui->re_passwd_reg->setFocus();
+        return;
+    }
+    regexp.setPattern(PHONE_REG);
+    if(!regexp.exactMatch(phone))
+    {
+        QMessageBox::warning(this, "警告", "手机号码格式不正确");
+        ui->phone_reg->clear();
+        ui->phone_reg->setFocus();
+        return;
+    }
+    regexp.setPattern(EMAIL_REG);
+    if(!regexp.exactMatch(email))
+    {
+        QMessageBox::warning(this, "警告", "邮箱格式不正确");
+        ui->email_reg->clear();
+        ui->email_reg->setFocus();
+        return;
+    }
     // 注册信息 to json
-    QByteArray postData = getRegJson(name, nick, pwd, phone, email);
+    QByteArray postData = setRegJson(name, nick, firstPwd, phone, email);
 
-    // http 请求协议类  Common全局对象
+    // http 请求协议类  Common单例模式全局对象
     QNetworkAccessManager * manager = Common::getNetManager();
     // http 头
     QNetworkRequest request;
@@ -126,11 +178,11 @@ void Login::on_signup_button_2_clicked()
             // success
             // 当前注册信息填入登录框
             ui->name_login->setText(name);
-            ui->passwd_login->setText(pwd);
+            ui->passwd_login->setText(firstPwd);
             // 清除注册信息
             ui->name_reg->clear();
             ui->id_reg ->clear();
-            ui->passwd__reg->clear();
+            ui->passwd_reg->clear();
             ui->re_passwd_reg->clear();
             ui->phone_reg->clear();
             ui->email_reg->clear();
@@ -150,6 +202,8 @@ void Login::on_signup_button_2_clicked()
             QMessageBox::warning(this, "警告", "注册失败!");
             qDebug() << "fail";
         }
+        // 释放资源
+        delete reply;
     });
 }
 
@@ -274,8 +328,17 @@ void Login::saveWebInfo(QString ip, QString port, QString type_path)
 
 
 // 编辑注册 json data
-QByteArray Login::getRegJson(QString user, QString nick, QString pwd, QString phone, QString email)
+QByteArray Login::setRegJson(QString user, QString nick, QString pwd, QString phone, QString email)
 {
+    /*
+        {
+            userName:xxxx,
+            nickName:xxx,
+            firstPwd:xxx,
+            phone:xxx,
+            email:xxx
+        }
+    */
     QJsonObject regObj;
     regObj.insert("userName", user);
     regObj.insert("nickName", nick);
@@ -294,12 +357,135 @@ void Login::on_signin_button_clicked()
     // 取数据
     QString user = ui->name_login->text();
     QString passwd = ui->passwd_login->text();
+
     QString ip = ui->ip_set->text();
     QString port = ui->port_set->text();
     // 数据校验
+    QRegExp regexp(USER_REG);
+    if(!regexp.exactMatch(user))
+    {
+        QMessageBox::warning(this, "警告", "用户名格式不正确");
+        ui->name_login->clear();
+        ui->name_login->setFocus();
+        return;
+    }
+    regexp.setPattern(PASSWD_REG);
+    if(!regexp.exactMatch(user))
+    {
+        QMessageBox::warning(this, "登录失败", "用户名或密码不正确！");
+        ui->passwd_login->clear();
+        ui->passwd_login->setFocus();
+        return;
+    }
     // 是否保存密码
     bool remember = ui->remember_check->isChecked();
     // 将文件保存到配置文件
     m_cm.writeLoginInfo(user, passwd, remember);
-    // 登录的 json 数据包
+    // 登录的 json 数据包  MD5加密
+    QByteArray info = setLoginJson(user, m_cm.getStrMd5(passwd));
+    QString url = QString("http://%1:%2/login").arg(ip).arg(port);
+
+    // 请求 http 数据
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+
+    // 请求头Header  ContentType/ContentLength
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/json"));
+    request.setHeader(QNetworkRequest::ContentLengthHeader, QVariant(info.size()));
+
+    // 发送 post 请求
+    QNetworkAccessManager *manger = m_cm.getNetManager();
+    QNetworkReply *reply = manger->post(request, info);
+    cout << "post url:" << url << "post data:" << info;
+
+    // 接收服务器回复 finished/readyRead  信号
+    connect(reply, &QNetworkReply::finished, [=]()
+    {
+        // 出错
+        if(reply->error() != QNetworkReply::NoError)
+        {
+            cout << reply->errorString();
+            // 释放资源
+            reply->deleteLater();  //温柔退出
+            return;
+        }
+
+        // 成功
+        // 读服务器回复数据
+        QByteArray json = reply->readAll();
+        /*
+            成功：{"code":"000"}
+            失败：{"code":"001"}
+        */
+        cout << "server return code:" << json;
+        QStringList tmpList = getLoginStatus(json);
+        if(tmpList.at(0) == "000")
+        {
+            cout << "登录成功";
+
+            // 隐藏当前窗口
+            this->hide();
+            // 跳转
+            m_mainWin->show();
+        }
+        // 失败
+        else
+        {
+            QMessageBox::warning(this, "登录失败", "用户名或密码不正确！");
+        }
+        // 释放资源
+        reply->deleteLater();
+    });
+}
+
+QByteArray Login::setLoginJson(QString user, QString pwd)
+{
+    /*
+        {
+            user:xxxx,
+            pwd:xxx
+        }
+    */
+    QMap<QString, QVariant> login;
+    login.insert("user", user);
+    login.insert("user", pwd);
+    QJsonDocument doc = QJsonDocument::fromVariant(login);
+    if(doc.isEmpty())
+    {
+        cout << "Login doc.isNULL()";
+        return "";
+    }
+    return doc.toJson();
+}
+
+QStringList Login::getLoginStatus(QByteArray json)
+{
+    QJsonParseError m_error;
+    QStringList list;
+
+    // json to JSONdoc
+    QJsonDocument doc = QJsonDocument::fromJson(json, &m_error);
+    if(m_error.error == QJsonParseError::NoError)
+    {
+        if(doc.isNull() || doc.isEmpty())
+        {
+            cout << "doc.isNull() || doc.isEmpty()";
+            return list;
+        }
+        if(doc.isObject())
+        {
+            // 解析大对象
+            QJsonObject obj = doc.object();
+            cout << "服务器回复数据:" << obj;
+            // 状态码
+            list.append(obj.value("code").toString());
+            // Token
+            list.append(obj.value("token").toString());
+        }
+    }
+    else
+    {
+        cout << "err:" << m_error.errorString();
+    }
+    return list;
 }
