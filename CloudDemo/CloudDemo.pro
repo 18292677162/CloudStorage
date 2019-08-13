@@ -25,24 +25,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        buttongroup.cpp \
         common/common.cpp \
         common/des.c \
+        common/logininfoinstance.cpp \
         login.cpp \
         main.cpp \
         mainwindow.cpp \
-        titlewg.cpp
+        myfilewg.cpp \
+        rankinglist.cpp \
+        sharelist.cpp \
+        titlewg.cpp \
+        transfer.cpp
 
 HEADERS += \
+        buttongroup.h \
         common/common.h \
         common/des.h \
+        common/logininfoinstance.h \
         login.h \
         mainwindow.h \
-        titlewg.h
+        myfilewg.h \
+        rankinglist.h \
+        sharelist.h \
+        titlewg.h \
+        transfer.h
 
 FORMS += \
+        buttongroup.ui \
         login.ui \
         mainwindow.ui \
-        titlewg.ui
+        myfilewg.ui \
+        rankinglist.ui \
+        sharelist.ui \
+        titlewg.ui \
+        transfer.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

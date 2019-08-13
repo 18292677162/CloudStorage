@@ -836,7 +836,7 @@ color: rgb(255, 255, 255);</string>
   <customwidget>
    <class>TitleWg</class>
    <extends>QWidget</extends>
-   <header location="global">titlewg.h</header>
+   <header>titlewg.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

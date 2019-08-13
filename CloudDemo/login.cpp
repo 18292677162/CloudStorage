@@ -10,6 +10,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include "common/des.h"
+#include "common/logininfoinstance.h"
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
@@ -23,6 +25,13 @@ Login::Login(QWidget *parent) :
     // 设置除ui设置外所有字体
     this->setFont(QFont("宋体", 11, QFont::Normal, false));
 
+    // 指针
+    m_mainWin = new MainWindow;
+
+    // 窗口图标
+    this->setWindowIcon(QIcon(":/image/logo.ico"));
+    m_mainWin->setWindowIcon(QIcon(":/image/logo.ico"));
+
     // 密码打码
     ui->passwd_reg->setEchoMode(QLineEdit::Password);
     ui->passwd_login->setEchoMode(QLineEdit::Password);
@@ -33,8 +42,6 @@ Login::Login(QWidget *parent) :
     {
         // 切换到设置
         ui->stackedWidget->setCurrentWidget(ui->set_page);
-        // 清空密码
-        ui->passwd_login->clear();
     });
 
     connect(ui->title_wg, &TitleWg::closeWindow , this, [=]()
@@ -70,6 +77,9 @@ Login::Login(QWidget *parent) :
         // 设置焦点（默认选取）
         ui->name_reg->setFocus();
     });
+
+    // 初始化信息
+    readCfg();
 }
 
 Login::~Login()
@@ -426,7 +436,7 @@ void Login::on_signin_button_clicked()
             // 隐藏当前窗口
             this->hide();
             // 跳转
-            m_mainWin->show();
+            m_mainWin->showMainWin();
         }
         // 失败
         else
@@ -488,4 +498,67 @@ QStringList Login::getLoginStatus(QByteArray json)
         cout << "err:" << m_error.errorString();
     }
     return list;
+}
+
+// 读取配置信息，设置默认登录状态，默认设置信息
+void Login::readCfg()
+{
+    QString user = m_cm.getCfgValue("login", "user");
+    QString pwd = m_cm.getCfgValue("login", "pwd");
+    QString remeber = m_cm.getCfgValue("login", "remember");
+    int ret = 0;
+
+    if(remeber == "yes")//记住密码
+    {
+        //密码解密
+        unsigned char encPwd[512] = {0};
+        int encPwdLen = 0;
+        //toLocal8Bit(), 转换为本地字符集，默认windows则为gbk编码，linux为utf-8编码
+        QByteArray tmp = QByteArray::fromBase64( pwd.toLocal8Bit());
+        ret = DesDec( (unsigned char *)tmp.data(), tmp.size(), encPwd, &encPwdLen);
+        if(ret != 0)
+        {
+            cout << "DesDec";
+            return;
+        }
+
+    #ifdef _WIN32 //如果是windows平台
+        //fromLocal8Bit(), 本地字符集转换为utf-8
+        ui->passwd_login->setText( QString::fromLocal8Bit( (const char *)encPwd, encPwdLen ) );
+    #else //其它平台
+        ui->passwd_login->setText( (const char *)encPwd );
+    #endif
+
+        ui->remember_check->setChecked(true);
+
+    }
+    else //没有记住密码
+    {
+        ui->passwd_login->setText("");
+        ui->remember_check->setChecked(false);
+    }
+
+    //用户解密
+    unsigned char encUsr[512] = {0};
+    int encUsrLen = 0;
+    //toLocal8Bit(), 转换为本地字符集，如果windows则为gbk编码，如果linux则为utf-8编码
+    QByteArray tmp = QByteArray::fromBase64( user.toLocal8Bit());
+    ret = DesDec( (unsigned char *)tmp.data(), tmp.size(), encUsr, &encUsrLen);
+    if(ret != 0)
+    {
+        cout << "DesDec";
+        return;
+    }
+
+    #ifdef _WIN32 //如果是windows平台
+        //fromLocal8Bit(), 本地字符集转换为utf-8
+        ui->name_login->setText( QString::fromLocal8Bit( (const char *)encUsr, encUsrLen ) );
+    #else //其它平台
+        ui->name_login->setText( (const char *)encUsr );
+    #endif
+
+    QString ip = m_cm.getCfgValue("web_server", "ip");
+    QString port = m_cm.getCfgValue("web_server", "port");
+    ui->ip_set->setText(ip);
+    ui->port_set->setText(port);
 }

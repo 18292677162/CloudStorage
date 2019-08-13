@@ -6,35 +6,62 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>850</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>400</width>
-     <height>23</height>
-    </rect>
-   </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="ButtonGroup" name="btn_group" native="true"/>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <widget class="MyFileWg" name="myfiles_page"/>
+      <widget class="ShareList" name="sharefile_page"/>
+      <widget class="RankingList" name="ranking_page"/>
+      <widget class="Transfer" name="transfer_page"/>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ButtonGroup</class>
+   <extends>QWidget</extends>
+   <header>buttongroup.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MyFileWg</class>
+   <extends>QWidget</extends>
+   <header>myfilewg.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ShareList</class>
+   <extends>QWidget</extends>
+   <header>sharelist.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>Transfer</class>
+   <extends>QWidget</extends>
+   <header>transfer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RankingList</class>
+   <extends>QWidget</extends>
+   <header>rankinglist.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

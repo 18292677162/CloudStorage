@@ -45,9 +45,13 @@ private slots:
     void on_signin_button_clicked();
 
 private:
+    // 读取配置信息，设置默认登录状态，默认设置信息
+    void readCfg();
+
+private:
     Ui::Login *ui;
     // 主窗口类 指针
-    MainWindow *m_mainWin;
+    MainWindow* m_mainWin;
     Common m_cm;
 };
 
