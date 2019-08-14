@@ -16,10 +16,21 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // 显示主窗口
     void showMainWin();
+
+    // 处理 ButtonGroup 所有信号
+    void managerSignals();
+
+    // 重新登录
+    void loginAgain();
 
 protected:
     void paintEvent(QPaintEvent *event);
+
+signals:
+    // 切换用户按钮信号
+    void changeUser();
 
 private:
     Ui::MainWindow *ui;

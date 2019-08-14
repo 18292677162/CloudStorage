@@ -29,6 +29,9 @@ SOURCES += \
         common/common.cpp \
         common/des.c \
         common/logininfoinstance.cpp \
+        common/uploadlayout.cpp \
+        common/uploadtask.cpp \
+        dataprogress.cpp \
         login.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -43,6 +46,9 @@ HEADERS += \
         common/common.h \
         common/des.h \
         common/logininfoinstance.h \
+        common/uploadlayout.h \
+        common/uploadtask.h \
+        dataprogress.h \
         login.h \
         mainwindow.h \
         myfilewg.h \
@@ -53,6 +59,7 @@ HEADERS += \
 
 FORMS += \
         buttongroup.ui \
+        dataprogress.ui \
         login.ui \
         mainwindow.ui \
         myfilewg.ui \

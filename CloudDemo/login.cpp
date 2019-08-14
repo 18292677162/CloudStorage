@@ -38,12 +38,14 @@ Login::Login(QWidget *parent) :
     ui->re_passwd_reg->setEchoMode(QLineEdit::Password);
 
     // titlewidget信号处理
+    // 切换到设置
     connect(ui->title_wg, &TitleWg::showSetWg, this, [=]()
     {
         // 切换到设置
         ui->stackedWidget->setCurrentWidget(ui->set_page);
     });
 
+    // 关闭
     connect(ui->title_wg, &TitleWg::closeWindow , this, [=]()
     {
         // 判断当前页面 or 首页面
@@ -78,8 +80,17 @@ Login::Login(QWidget *parent) :
         ui->name_reg->setFocus();
     });
 
+    // 切换用户
+    connect(m_mainWin, &MainWindow::changeUser, [=]()
+    {
+        m_mainWin->hide();
+        ui->passwd_login->clear();
+        this->show();
+    });
+
     // 初始化信息
     readCfg();
+
 }
 
 Login::~Login()
@@ -432,6 +443,11 @@ void Login::on_signin_button_clicked()
         if(tmpList.at(0) == "000")
         {
             cout << "登录成功";
+
+            // 设置登陆信息，显示文件列表界面需要使用这些信息
+            LoginInfoInstance *loginInfo = LoginInfoInstance::getInstance(); //获取单例
+            loginInfo->setLoginInfo(user, ip, port, tmpList.at(1));
+            cout << loginInfo->getUser().toUtf8().data() << ", " << loginInfo->getIp() << ", " << loginInfo->getPort() << tmpList.at(1);
 
             // 隐藏当前窗口
             this->hide();

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include "common/common.h"
+#include "common/uploadtask.h"
 
 namespace Ui {
 class MyFileWg;
@@ -17,8 +18,10 @@ public:
     explicit MyFileWg(QWidget *parent = nullptr);
     ~MyFileWg();
 
+
 private:
     Ui::MyFileWg *ui;
+
 };
 
 #endif // MYFILEWG_H

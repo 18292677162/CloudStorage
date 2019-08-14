@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 默认显示我的文件窗口
     ui->stackedWidget->setCurrentWidget(ui->myfiles_page);
+    
 
     // 设置除ui设置外所有字体
     this->setFont(QFont("幼圆", 12, QFont::Normal, false));
