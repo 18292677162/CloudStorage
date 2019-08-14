@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include "login.h"
+#include "common/logininfoinstance.h"
 
 ButtonGroup::ButtonGroup(QWidget *parent) :
     QWidget(parent),
@@ -16,8 +17,8 @@ ButtonGroup::ButtonGroup(QWidget *parent) :
     m_curBtn = ui->myfile;
     m_curBtn->setStyleSheet("color:red");
 
-    QString userNow= m_cm.getCfgValue("login", "user");
-    ui->login_usr->text() = userNow;
+    // LoginInfoInstance *info = LoginInfoInstance::getInstance();
+    // ui->login_usr->setText(info->getUser());
 
     // key:value == 按钮显示内容：按钮指针
     m_btns.insert(ui->myfile->text(), ui->myfile);
@@ -42,21 +43,22 @@ ButtonGroup::ButtonGroup(QWidget *parent) :
     connect(m_mapper, SIGNAL(mapped(QString)), this, SLOT(slotButtonClick(QString)));
 
     // 关闭
-    connect(ui->close, &QToolButton::clicked, [=]()
+    connect(ui->close, &QToolButton::clicked, this, [=]()
     {
         emit closeWindow();
     });
+
     // 最大化
     connect(ui->max, &QToolButton::clicked, [=]()
     {
         static bool fl = false;
         if(!fl)
         {
-            ui->max->setIcon(QIcon(":/images/title_normal.png"));
+            ui->max->setIcon(QIcon(":/image/title_normal.png"));
         }
         else
         {
-            ui->max->setIcon(QIcon(":/images/title_max.png"));
+            ui->max->setIcon(QIcon(":/image/title_max.png"));
         }
         fl = !fl;
         emit maxWindow();
@@ -118,13 +120,16 @@ void ButtonGroup::setParent(QWidget *parent)
     m_parent = parent;
 }
 
+
 void ButtonGroup::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
     QPainter painter(this);
-    QPixmap bk(":/images/title_bk.jpg");
+    QPixmap bk(":/image/title_bk.jpg");
     painter.drawPixmap(0, 0, width(), height(), bk);
 }
+
+
 
 void ButtonGroup::mousePressEvent(QMouseEvent *event)
 {
