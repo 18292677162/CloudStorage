@@ -9,8 +9,6 @@
         <file>image/logo.ico</file>
         <file>image/tile_close.png</file>
         <file>image/tile_min.png</file>
-        <file>image/title_bk.jpg</file>
-        <file>image/title_bk2.jpg</file>
         <file>image/title_close.png</file>
         <file>image/title_min.png</file>
         <file>image/title_max.png</file>
@@ -22,5 +20,7 @@
         <file>image/title_user.png</file>
         <file>image/upload.png</file>
         <file>image/title_bk3.jpg</file>
+        <file>image/title_normal.png</file>
+        <file>image/title_bk.jpg</file>
     </qresource>
 </RCC>
