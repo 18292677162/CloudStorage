@@ -16,7 +16,7 @@ public:
     explicit DataProgress(QWidget *parent = 0);
     ~DataProgress();
 
-    void setFileName(QString name = "测试"); //设置文件名字
+    void setFileName(QString name = "文件"); //设置文件名字
     void setProgress(int value = 0, int max = 100); //设置进度条的当前值value, 最大值max
 
 private:

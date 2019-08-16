@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // 默认显示我的文件窗口
     ui->stackedWidget->setCurrentWidget(ui->myfiles_page);
 
+    // 给菜单窗口传参
+
+    ui->btn_group->setParent(this);
     // 设置除ui设置外所有字体
     this->setFont(QFont("幼圆", 12, QFont::Normal, false));
 
@@ -30,7 +33,10 @@ MainWindow::~MainWindow()
 void MainWindow::showMainWin()
 {
     m_common.moveToCenter(this); //居中显示
+    // 切换到我的文件页面
     ui->stackedWidget->setCurrentWidget(ui->myfiles_page);
+    // 刷新文件列表
+    ui->myfiles_page->refreshFiles();
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -70,7 +76,6 @@ void MainWindow::managerSignals()
     {
         ui->stackedWidget->setCurrentWidget(ui->myfiles_page);
         // 刷新文件列表
-
     });
 
     // 分享列表
@@ -102,6 +107,21 @@ void MainWindow::managerSignals()
     {
         loginAgain();
     });
+
+    // stack 窗口切换
+    connect(ui->myfiles_page, &MyFileWg::gotoTransfer, [=](TransferStatus status)
+    {
+        ui->btn_group->slotButtonClick(Page::TRANSFER);
+        if(status == TransferStatus::Uplaod)
+        {
+            ui->transfer_page->showUpload();
+        }
+        else if (status == TransferStatus::Download) {
+            ui->transfer_page->showDownload();
+        }
+    });
+
+    // connect(ui->sharefile_page, &ShareList::gotoTransfar, ui->myfiles_page, &MyFileWg::gotoTransfer);
 }
 
 // 重新登录
@@ -111,5 +131,8 @@ void MainWindow::loginAgain()
     cout << "exit";
     emit changeUser();
     // 删除上一个用户传输列表
+    ui->myfiles_page->clearAllTask();
     // 删除上一个用户文件信息
+    ui->myfiles_page->clearFileList();
+    ui->myfiles_page->clearItems();
 }

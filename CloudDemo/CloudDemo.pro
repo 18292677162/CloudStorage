@@ -36,6 +36,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         myfilewg.cpp \
+        mymenu.cpp \
         rankinglist.cpp \
         sharelist.cpp \
         titlewg.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
         login.h \
         mainwindow.h \
         myfilewg.h \
+        mymenu.h \
         rankinglist.h \
         sharelist.h \
         titlewg.h \

@@ -168,7 +168,7 @@ void Login::on_signup_button_2_clicked()
         return;
     }
     // 注册信息 to json
-    QByteArray postData = setRegJson(name, nick, firstPwd, phone, email);
+    QByteArray postData = setRegJson(name, nick, m_cm.getStrMd5(firstPwd), phone, email);
 
     // http 请求协议类  Common单例模式全局对象
     QNetworkAccessManager * manager = Common::getNetManager();
@@ -391,7 +391,7 @@ void Login::on_signin_button_clicked()
         return;
     }
     regexp.setPattern(PASSWD_REG);
-    if(!regexp.exactMatch(user))
+    if(!regexp.exactMatch(passwd))
     {
         QMessageBox::warning(this, "登录失败", "用户名或密码不正确！");
         ui->passwd_login->clear();
@@ -474,7 +474,7 @@ QByteArray Login::setLoginJson(QString user, QString pwd)
     */
     QMap<QString, QVariant> login;
     login.insert("user", user);
-    login.insert("user", pwd);
+    login.insert("pwd", pwd);
     QJsonDocument doc = QJsonDocument::fromVariant(login);
     if(doc.isEmpty())
     {

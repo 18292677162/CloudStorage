@@ -103,7 +103,7 @@ private:
 
     // 定时器
     QTimer m_uploadFileTimer;   // 检查上传队列是否有任务
-    QTimer m_downloadTimer;     // 检查下载队列是否有任务
+    QTimer m_downloadTimer;    // 检查下载队列是否有任务
 
 };
 
