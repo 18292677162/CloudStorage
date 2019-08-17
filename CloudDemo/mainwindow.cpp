@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->btn_group->setParent(this);
     // 设置除ui设置外所有字体
-    this->setFont(QFont("幼圆", 12, QFont::Normal, false));
+    this->setFont(QFont("微软雅黑", 10, QFont::Normal, false));
 
     // 处理所有信号
     managerSignals();
@@ -76,6 +76,7 @@ void MainWindow::managerSignals()
     {
         ui->stackedWidget->setCurrentWidget(ui->myfiles_page);
         // 刷新文件列表
+        ui->myfiles_page->refreshFiles();
     });
 
     // 分享列表
@@ -98,8 +99,6 @@ void MainWindow::managerSignals()
     connect(ui->btn_group, &ButtonGroup::sigTransform, [=]()
     {
         ui->stackedWidget->setCurrentWidget(ui->transfer_page);
-        // 刷新传输列表
-
     });
 
     // 切换用户

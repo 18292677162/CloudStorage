@@ -729,13 +729,13 @@ void MyFileWg::getUserFilesList(MyFileWg::Display cmd)
     else if(cmd == PvAsc) {flag = "pvasc";}
     else if(cmd == PvDesc) {flag = "pvdesc";}
 
-    QString url = QString("http://%1:%2/myfiles?cmd=%3").arg(loginInfo->getIp().arg(loginInfo->getPort()).arg(flag));
+    QString url = QString("http://%1:%2/myfiles?cmd=%3").arg(loginInfo->getIp()).arg(loginInfo->getPort()).arg(flag);
     request.setUrl(QUrl(url));
 
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     /*
     {
-        "user": "yoyo"
+        "user": "pinna"
         "token": "xxxx"
         "start": 0
         "count": 10
@@ -814,5 +814,94 @@ void MyFileWg::getFileJsonInfo(QByteArray data)
     //-- pv 文件下载量，默认值为0，下载一次加1
     //-- url 文件url
     //-- size 文件大小, 以字节为单位
-    //-- type 文件类型： png, zip, mp4……
+    //-- type 文件类型： png
+
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+    if(error.error == QJsonParseError::NoError)
+    {
+        if(doc.isNull() || doc.isEmpty())
+        {
+            cout << "doc.isNull() || doc.isEmpty";
+            return;
+        }
+        if(doc.isObject())
+        {
+            // 获取 json 对象
+            QJsonObject obj = doc.object();
+            QJsonArray array = obj.value("files").toArray();
+
+            int size = array.size();
+            cout << "size = " << size;
+
+            for(int i = 0; i < size; ++i)
+            {
+                // 取第一个对象
+                QJsonObject tmp = array[i].toObject();
+                /*
+                    //文件信息
+                    struct FileInfo
+                    {
+                        QString md5;        //文件md5码
+                        QString filename;   //文件名字
+                        QString user;       //用户
+                        QString time;       //上传时间
+                        QString url;        //url
+                        QString type;       //文件类型
+                        qint64 size;        //文件大小
+                        int shareStatus;    //是否共享, 1共享， 0不共享
+                        int pv;             //下载量
+                        QListWidgetItem *item; //list widget 的item
+                    };
+
+                    {
+                    "user": "pinna",
+                    "md5": "e8ea6031b779ac26c319ddf949ad9d8d",
+                    "time": "2019-3-23 02:15:43",
+                    "filename": "test.png",
+                    "share_status": 0,
+                    "pv": 0,
+                    "url": "http://192.168.93.178:80/group1/M00/00/00/wKgfbViy2Z2AJ-FTAaM3Asag3Z0782.png",
+                    "size": 27473666,
+                    "type": "png"
+                    }
+                */
+                FileInfo *info = new FileInfo;
+                info->user = tmp.value("user").toString(); //用户
+                info->md5 = tmp.value("md5").toString(); //文件md5
+                info->time = tmp.value("time").toString(); //上传时间
+                info->filename = tmp.value("filename").toString(); //文件名字
+                info->shareStatus = tmp.value("share_status").toInt(); //共享状态
+                info->pv = tmp.value("pv").toInt(); //下载量
+                info->url = tmp.value("url").toString(); //url
+                info->size = tmp.value("size").toInt(); //文件大小，以字节为单位
+                info->type = tmp.value("type").toString();//文件后缀
+                QString type = info->type + ".png"; // 类型图片后缀
+
+                // 创建一个 item
+                info->item = new QListWidgetItem(QIcon(m_cm.getFileType(type)), info->filename);
+
+                // 添加文件到列表
+                m_fileList.append(info);
+            }
+        }
+    }
+    else
+    {
+        cout << "err = " << error.errorString();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

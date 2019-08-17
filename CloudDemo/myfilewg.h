@@ -46,27 +46,56 @@ public:
 
 
     //--------------------------显示用户的文件列表------------------------
-     // desc ---> descend   降序
-     // asc   ---> ascend       升序
-     // Normal：普通用户列表，PvAsc：按下载量升序， PvDesc：按下载量降序
-     enum Display{Normal, PvAsc, PvDesc};
-     // 得到服务器json文件
-     QStringList getCountStatus(QByteArray json);
-     // 显示用户的文件列表
-     void refreshFiles(Display cmd=Normal);
-     // 设置json包
-     QByteArray setGetCountJson(QString user, QString token);
-     // 设置json包
-     QByteArray setFilesListJson(QString user, QString token, int start, int count);
-     // 获取用户文件列表
-     void getUserFilesList(Display cmd=Normal);
-     // 解析文件列表json信息，存放在文件列表中
-     void getFileJsonInfo(QByteArray data);
+    // desc ---> descend   降序
+    // asc   ---> ascend       升序
+    // Normal：普通用户列表，PvAsc：按下载量升序， PvDesc：按下载量降序
+    enum Display{Normal, PvAsc, PvDesc};
+    // 得到服务器json文件
+    QStringList getCountStatus(QByteArray json);
+    // 显示用户的文件列表
+    void refreshFiles(Display cmd=Normal);
+    // 设置json包
+    QByteArray setGetCountJson(QString user, QString token);
+    // 设置json包
+    QByteArray setFilesListJson(QString user, QString token, int start, int count);
+    // 获取用户文件列表
+    void getUserFilesList(Display cmd=Normal);
+    // 解析文件列表json信息，存放在文件列表中
+    void getFileJsonInfo(QByteArray data);
 
-    //清除上传下载任务
+
+
+    // ------------------------分享/删除文件---------------------
+    // 处理选中的文件
+    void dealSelectdFile(QString cmd="分享");
+    // 设置删除 json 包
+    QByteArray setDealFileJson(QString user, QString token, QString md5, QString filename);
+
+    // 分享文件
+    void shareFile(FileInfo *info);
+
+    // 删除文件
+    void delFile(FileInfo *info);
+
+    // -------------------------获取文件属性------------------------
+    // 获取属性信息
+    void getFileProperty(FileInfo *info);
+
+    // 清除上传下载任务
     void clearAllTask();
     // 定时检查处理任务队列中的任务
     void checkTaskList();
+
+
+    // -------------------------下载文件处理----------------------------
+    // 添加需要下载的文件到下载任务列表
+    void addDownloadFiles();
+    // 下载文件处理，取出下载任务列表的队首任务，下载完后，再取下一个任务
+    void downloadFilesAction();
+
+    // 下载文件标志处理
+    // 下载文件pv字段处理
+    void dealFilePv(QString md5, QString filename);
 
 private:
     // 右键菜单信号槽函数
@@ -103,7 +132,7 @@ private:
 
     // 定时器
     QTimer m_uploadFileTimer;   // 检查上传队列是否有任务
-    QTimer m_downloadTimer;     // 检查下载队列是否有任务
+    QTimer m_downloadTimer;    // 检查下载队列是否有任务
 
 };
 

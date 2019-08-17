@@ -91,6 +91,8 @@ Login::Login(QWidget *parent) :
     // 初始化信息
     readCfg();
 
+    // 加载图片信息 - 显示文件列表的时候用，在此初始化
+    m_cm.getFileTypeList();
 }
 
 Login::~Login()
