@@ -64,23 +64,6 @@ public:
     void getFileJsonInfo(QByteArray data);
 
 
-
-    // ------------------------分享/删除文件---------------------
-    // 处理选中的文件
-    void dealSelectdFile(QString cmd="分享");
-    // 设置删除 json 包
-    QByteArray setDealFileJson(QString user, QString token, QString md5, QString filename);
-
-    // 分享文件
-    void shareFile(FileInfo *info);
-
-    // 删除文件
-    void delFile(FileInfo *info);
-
-    // -------------------------获取文件属性------------------------
-    // 获取属性信息
-    void getFileProperty(FileInfo *info);
-
     // 清除上传下载任务
     void clearAllTask();
     // 定时检查处理任务队列中的任务
@@ -93,9 +76,26 @@ public:
     // 下载文件处理，取出下载任务列表的队首任务，下载完后，再取下一个任务
     void downloadFilesAction();
 
-    // 下载文件标志处理
-    // 下载文件pv字段处理
+    // 下载文件标志 pv 处理
     void dealFilePv(QString md5, QString filename);
+
+
+
+    // ------------------------分享/删除文件------------------------
+    // 处理选中的文件
+    void dealSelectdFile(QString cmd="分享");
+    // 设置删除 json 包
+    QByteArray setDealFileJson(QString user, QString token, QString md5, QString filename);
+
+    // 分享文件
+    void shareFile(FileInfo *info);
+
+    // 删除文件
+    void delFile(FileInfo *info);
+    // -------------------------获取文件属性------------------------
+    // 获取属性信息
+    void getFileProperty(FileInfo *info);
+
 
 private:
     // 右键菜单信号槽函数

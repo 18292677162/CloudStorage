@@ -25,12 +25,12 @@ public:
     // 重新登录
     void loginAgain();
 
-protected:
-    void paintEvent(QPaintEvent *event);
-
 signals:
     // 切换用户按钮信号
     void changeUser();
+
+protected:
+    void paintEvent(QPaintEvent *event);
 
 private:
     Ui::MainWindow *ui;

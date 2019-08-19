@@ -18,12 +18,12 @@
     <widget class="QTabWidget" name="tabWidget">
      <property name="font">
       <font>
-       <family>新宋体</family>
-       <pointsize>16</pointsize>
+       <family>微软雅黑</family>
+       <pointsize>12</pointsize>
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="upload">
       <attribute name="title">

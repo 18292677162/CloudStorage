@@ -28,10 +28,13 @@ SOURCES += \
         buttongroup.cpp \
         common/common.cpp \
         common/des.c \
+        common/downloadlayout.cpp \
+        common/downloadtask.cpp \
         common/logininfoinstance.cpp \
         common/uploadlayout.cpp \
         common/uploadtask.cpp \
         dataprogress.cpp \
+        filepropertyinfo.cpp \
         login.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -46,10 +49,13 @@ HEADERS += \
         buttongroup.h \
         common/common.h \
         common/des.h \
+        common/downloadlayout.h \
+        common/downloadtask.h \
         common/logininfoinstance.h \
         common/uploadlayout.h \
         common/uploadtask.h \
         dataprogress.h \
+        filepropertyinfo.h \
         login.h \
         mainwindow.h \
         myfilewg.h \
@@ -62,6 +68,7 @@ HEADERS += \
 FORMS += \
         buttongroup.ui \
         dataprogress.ui \
+        filepropertyinfo.ui \
         login.ui \
         mainwindow.ui \
         myfilewg.ui \

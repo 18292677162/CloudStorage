@@ -440,7 +440,6 @@ void Common::writeRecord(QString user, QString name, QString code, QString path)
     }
 
     // 记录包操作
-    // xxx.jpg       2017年2月27日12:04:49       秒传成功
     // 获取当前时间
     QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
     QString timeStr = time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式

@@ -84,7 +84,7 @@ void MainWindow::managerSignals()
     {
         ui->stackedWidget->setCurrentWidget(ui->sharefile_page);
         // 刷新分享列表
-
+        ui->sharefile_page->refreshFiles();
     });
 
     // 下载榜
@@ -92,7 +92,7 @@ void MainWindow::managerSignals()
     {
         ui->stackedWidget->setCurrentWidget(ui->ranking_page);
         // 刷新下载榜列表
-
+        ui->ranking_page->refreshFiles();
     });
 
     // 传输列表
@@ -119,8 +119,8 @@ void MainWindow::managerSignals()
             ui->transfer_page->showDownload();
         }
     });
-
-    // connect(ui->sharefile_page, &ShareList::gotoTransfar, ui->myfiles_page, &MyFileWg::gotoTransfer);
+    // 信号传递
+    connect(ui->sharefile_page, &ShareList::gotoTransfer, ui->myfiles_page, &MyFileWg::gotoTransfer);
 }
 
 // 重新登录
