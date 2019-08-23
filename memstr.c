@@ -30,5 +30,3 @@ char* memstr(char* full_data, int full_data_len, char* substr)
     }
     return NULL;
 }
-
-
